@@ -6,25 +6,7 @@ class JumpGame:
         self.game_board = game_board
         self.jump_history = [[0 for _ in range(width)] for _ in range(width)]
 
-    def check_movable(self, i, j):
-        move_distance = self.game_board[i][j]
-        down_movable = i + move_distance < self.width
-        right_movable = j + move_distance < self.width
-        return down_movable, right_movable
-
-    def right(self, i, j):
-        move_distance = self.game_board[i][j]
-        return i, j + move_distance
-
-    def down(self, i, j):
-        move_distance = self.game_board[i][j]
-        return i + move_distance, j
-
     def jump(self, i=0, j=0):
-        if i  == j == self.width - 1:
-            self.reachable = True
-            return True
-
         if self.reachable:
             return True
 
@@ -34,20 +16,14 @@ class JumpGame:
         if self.jump_history[i][j] != 0:
             return self.jump_history[i][j]
 
-        down_movable, right_movable = self.check_movable(i, j)
-        down_result = False
-        right_result = False
+        move_distance = self.game_board[i][j]
+        if move_distance == 0:
+            self.reachable = True
+            return True
+        else:
+            self.jump_history[i][j] = self.jump(i+move_distance, j) or self.jump(i, j+move_distance)
 
-        if down_movable:
-            next_down_position = self.down(i, j)
-            down_result = self.jump(*next_down_position)
-
-        if right_movable:
-            next_right_position = self.right(i, j)
-            right_result = self.jump(*next_right_position)
-
-        self.jump_history[i][j] = down_result or right_result
-        return self.jump_history[i][j]
+        return False
 
 
 if __name__ == '__main__':
@@ -65,4 +41,5 @@ if __name__ == '__main__':
 
         jg = JumpGame(n, game_board)
         jg.jump()
+        print(jg.jump_history[1][6])
         print("YES" if jg.reachable else "NO")
